@@ -1,4 +1,4 @@
-0# mitigation.py
+# mitigation.py
 # Crisis-mode emergency patch for Muse Spark
 # Fixes: suicide/self-harm under-response in "looping" scenarios
 
