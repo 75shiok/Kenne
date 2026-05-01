@@ -3,7 +3,7 @@
 # Fixes: suicide/self-harm under-response in "looping" scenarios
 
 CRISIS_KEYWORDS = [
-    "suicide", "kill myself", "end my life", "want to die", 
+    "suicide, "kill myself", "end my life", "want to die", 
     "self harm", "cutting myself", "overdose", "hang myself"
 ]
 
