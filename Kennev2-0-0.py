@@ -27,10 +27,10 @@ class Kenne:
         print(f"Logged: {barrier_type}")
     
     def main(self):
-        print("=== Kenne v2.0.0 ===")
-        self.run_diagnostics()
-        self.document_barrier("CLI_ACCESS", "Termux installation failed on mobile")
-        print("Issue #1 documented successfully")
+    print("=== Kenne v2.0.0 ===")
+    self.run_diagnostics()
+    self.document_barrier("CLI_ACCESS", "Termux installation failed on mobile")
+    print("Issue #1 documented successfully")
 
 if __name__ == "__main__":
     kenne = Kenne()
