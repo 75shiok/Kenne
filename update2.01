@@ -1,0 +1,124 @@
+# mitigation_2.01.py
+# Muse Spark Crisis Mitigation Patch
+# Version: 2.01
+# Purpose: Detect crisis / self-harm language and force safer response routing.
+
+CRISIS_KEYWORDS = [
+    "suicide",
+    "kill myself",
+    "end my life",
+    "want to die",
+    "self harm",
+    "self-harm",
+    "hurt myself",
+    "can't go on",
+    "cannot go on",
+    "no reason to live",
+    "better off dead",
+    "i wish i was dead",
+    "i don't want to be here",
+    "i want everything to stop",
+]
+
+LOOPING_KEYWORDS = [
+    "again and again",
+    "looping",
+    "spiralling",
+    "spiraling",
+    "can't stop thinking",
+    "stuck in my head",
+    "same thoughts",
+    "repeating thoughts",
+]
+
+DISTRESS_KEYWORDS = [
+    "hopeless",
+    "worthless",
+    "alone",
+    "lonely",
+    "panic",
+    "terrified",
+    "overwhelmed",
+    "breaking down",
+    "i can't cope",
+    "i cannot cope",
+]
+
+
+def normalize_text(user_text):
+    if not user_text:
+        return ""
+    return user_text.lower().strip()
+
+
+def contains_any(text, keyword_list):
+    for keyword in keyword_list:
+        if keyword in text:
+            return True
+    return False
+
+
+def detect_risk_level(user_text):
+    """
+    Returns:
+    - "crisis" if direct self-harm / suicide language is detected
+    - "elevated" if looping + distress language appears together
+    - "normal" otherwise
+    """
+    text = normalize_text(user_text)
+
+    if contains_any(text, CRISIS_KEYWORDS):
+        return "crisis"
+
+    if contains_any(text, LOOPING_KEYWORDS) and contains_any(text, DISTRESS_KEYWORDS):
+        return "elevated"
+
+    return "normal"
+
+
+def crisis_response():
+    return (
+        "I'm really sorry you're feeling this way. "
+        "You don't have to handle this alone. "
+        "If you are in immediate danger, please call emergency services now. "
+        "If you are in the UK or ROI, you can call Samaritans free on 116 123. "
+        "Please also contact someone you trust and stay near another person if possible."
+    )
+
+
+def elevated_distress_response():
+    return (
+        "It sounds like your mind is stuck in a painful loop. "
+        "Let's slow this down first: breathe, drink some water, and move away from anything risky. "
+        "You do not need to solve your whole life tonight. "
+        "Just focus on the next safe 10 minutes."
+    )
+
+
+def normal_response():
+    return "Normal response flow continues here."
+
+
+def handle_user_message(user_text):
+    risk_level = detect_risk_level(user_text)
+
+    if risk_level == "crisis":
+        return crisis_response()
+
+    if risk_level == "elevated":
+        return elevated_distress_response()
+
+    return normal_response()
+
+
+if __name__ == "__main__":
+    test_messages = [
+        "I can't go on",
+        "I'm spiralling and I feel hopeless",
+        "Hello, how are you?",
+    ]
+
+    for message in test_messages:
+        print("USER:", message)
+        print("BOT:", handle_user_message(message))
+        print("-" * 50)
