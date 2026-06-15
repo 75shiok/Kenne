@@ -1,0 +1,193 @@
+# mitigation_2.04.py
+
+# Muse Spark Crisis Mitigation Patch
+
+# Version: 2.04
+
+# Adds: risk score report + matched category audit trail
+
+CRISIS_KEYWORDS = [
+"suicide",
+"suicidal",
+"kill myself",
+"end my life",
+"want to die",
+"self harm",
+"self-harm",
+"hurt myself",
+"can't go on",
+"cannot go on",
+"no reason to live",
+"better off dead",
+]
+
+NEGATION_PHRASES = [
+"not suicidal",
+"not suicide",
+"not going to kill myself",
+"not going to hurt myself",
+"i am safe",
+"i'm safe",
+"i don't want to die",
+"i do not want to die",
+]
+
+LOOPING_KEYWORDS = [
+"again and again",
+"looping",
+"spiralling",
+"spiraling",
+"can't stop thinking",
+"stuck in my head",
+"same thoughts",
+]
+
+DISTRESS_KEYWORDS = [
+"hopeless",
+"worthless",
+"alone",
+"lonely",
+"panic",
+"terrified",
+"overwhelmed",
+"breaking down",
+"can't cope",
+]
+
+PLANNING_KEYWORDS = [
+"goodbye",
+"farewell",
+"after i'm gone",
+"after i am gone",
+"final letter",
+"last message",
+]
+
+METHOD_KEYWORDS = [
+"overdose",
+"rope",
+"hanging",
+"jump off",
+"knife",
+"pills",
+"poison",
+]
+
+def normalize_text(user_text):
+if not user_text:
+return ""
+return user_text.lower().strip()
+
+def find_matches(text, keywords):
+return [keyword for keyword in keywords if keyword in text]
+
+def analyse_risk(user_text):
+text = normalize_text(user_text)
+
+```
+matches = {
+    "crisis": find_matches(text, CRISIS_KEYWORDS),
+    "method": find_matches(text, METHOD_KEYWORDS),
+    "planning": find_matches(text, PLANNING_KEYWORDS),
+    "looping": find_matches(text, LOOPING_KEYWORDS),
+    "distress": find_matches(text, DISTRESS_KEYWORDS),
+    "negation": find_matches(text, NEGATION_PHRASES),
+}
+
+score = 0
+
+if matches["crisis"]:
+    score += 5
+
+if matches["method"]:
+    score += 5
+
+if matches["planning"]:
+    score += 3
+
+if matches["looping"]:
+    score += 1
+
+if matches["distress"]:
+    score += 1
+
+if matches["negation"]:
+    if not matches["method"] and not matches["planning"]:
+        score = max(0, score - 4)
+
+if score >= 8:
+    level = "critical"
+elif score >= 5:
+    level = "crisis"
+elif score >= 2:
+    level = "elevated"
+else:
+    level = "normal"
+
+return {
+    "level": level,
+    "score": score,
+    "matches": matches,
+}
+```
+
+def critical_response():
+return (
+"[CRITICAL] High-risk language detected. "
+"Please seek immediate support from emergency services, "
+"a crisis line, or a trusted person nearby."
+)
+
+def crisis_response():
+return (
+"[CRISIS] Crisis language detected. "
+"Please reach out for immediate support and avoid being alone."
+)
+
+def elevated_distress_response():
+return (
+"[ELEVATED] Signs of distress detected. "
+"Focus on the next few minutes, slow things down, and seek support."
+)
+
+def normal_response():
+return "[NORMAL] Normal response flow continues here."
+
+def handle_user_message(user_text):
+result = analyse_risk(user_text)
+level = result["level"]
+
+```
+if level == "critical":
+    response = critical_response()
+elif level == "crisis":
+    response = crisis_response()
+elif level == "elevated":
+    response = elevated_distress_response()
+else:
+    response = normal_response()
+
+return response, result
+```
+
+if **name** == "**main**":
+test_messages = [
+"I can't go on",
+"I'm spiralling and hopeless",
+"I wrote a goodbye letter and bought pills",
+"I am not suicidal, just exhausted",
+"I don't want to die, I just need help",
+"Hello how are you",
+]
+
+```
+for message in test_messages:
+    response, result = handle_user_message(message)
+
+    print("USER:", message)
+    print("BOT:", response)
+    print("LEVEL:", result["level"])
+    print("SCORE:", result["score"])
+    print("MATCHES:", result["matches"])
+    print("-" * 50)
+```
