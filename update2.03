@@ -1,0 +1,180 @@
+# mitigation_2.03.py
+
+# Muse Spark Crisis Mitigation Patch
+
+# Version: 2.03
+
+# Adds: negation handling, safer scoring, clearer output labels
+
+CRISIS_KEYWORDS = [
+"suicide",
+"suicidal",
+"kill myself",
+"end my life",
+"want to die",
+"self harm",
+"self-harm",
+"hurt myself",
+"can't go on",
+"cannot go on",
+"no reason to live",
+"better off dead",
+]
+
+NEGATION_PHRASES = [
+"not suicidal",
+"not suicide",
+"not going to kill myself",
+"not going to hurt myself",
+"i am safe",
+"i'm safe",
+"i don't want to die",
+"i do not want to die",
+]
+
+LOOPING_KEYWORDS = [
+"again and again",
+"looping",
+"spiralling",
+"spiraling",
+"can't stop thinking",
+"stuck in my head",
+"same thoughts",
+]
+
+DISTRESS_KEYWORDS = [
+"hopeless",
+"worthless",
+"alone",
+"lonely",
+"panic",
+"terrified",
+"overwhelmed",
+"breaking down",
+"can't cope",
+]
+
+PLANNING_KEYWORDS = [
+"goodbye",
+"farewell",
+"after i'm gone",
+"after i am gone",
+"final letter",
+"last message",
+]
+
+METHOD_KEYWORDS = [
+"overdose",
+"rope",
+"hanging",
+"jump off",
+"knife",
+"pills",
+"poison",
+]
+
+def normalize_text(user_text):
+if not user_text:
+return ""
+return user_text.lower().strip()
+
+def contains_any(text, keywords):
+for keyword in keywords:
+if keyword in text:
+return True
+return False
+
+def detect_risk_level(user_text):
+text = normalize_text(user_text)
+score = 0
+
+```
+has_negation = contains_any(text, NEGATION_PHRASES)
+
+if contains_any(text, CRISIS_KEYWORDS):
+    score += 5
+
+if contains_any(text, METHOD_KEYWORDS):
+    score += 5
+
+if contains_any(text, PLANNING_KEYWORDS):
+    score += 3
+
+if contains_any(text, LOOPING_KEYWORDS):
+    score += 1
+
+if contains_any(text, DISTRESS_KEYWORDS):
+    score += 1
+
+# Reduce false positives when the user clearly says they are safe.
+# Do not reduce if method or planning language is present.
+if has_negation:
+    if not contains_any(text, METHOD_KEYWORDS) and not contains_any(text, PLANNING_KEYWORDS):
+        score = max(0, score - 4)
+
+if score >= 8:
+    return "critical"
+
+if score >= 5:
+    return "crisis"
+
+if score >= 2:
+    return "elevated"
+
+return "normal"
+```
+
+def critical_response():
+return (
+"[CRITICAL] High-risk language detected. "
+"Please seek immediate support from emergency services, "
+"a crisis line, or a trusted person nearby."
+)
+
+def crisis_response():
+return (
+"[CRISIS] Crisis language detected. "
+"Please reach out for immediate support and avoid being alone."
+)
+
+def elevated_distress_response():
+return (
+"[ELEVATED] Signs of distress detected. "
+"Focus on the next few minutes, slow things down, and seek support."
+)
+
+def normal_response():
+return "[NORMAL] Normal response flow continues here."
+
+def handle_user_message(user_text):
+risk_level = detect_risk_level(user_text)
+
+```
+if risk_level == "critical":
+    return critical_response()
+
+if risk_level == "crisis":
+    return crisis_response()
+
+if risk_level == "elevated":
+    return elevated_distress_response()
+
+return normal_response()
+```
+
+if **name** == "**main**":
+test_messages = [
+"I can't go on",
+"I'm spiralling and hopeless",
+"I wrote a goodbye letter and bought pills",
+"I am not suicidal, just exhausted",
+"I don't want to die, I just need help",
+"Hello how are you",
+]
+
+```
+for message in test_messages:
+    print("USER:", message)
+    print("BOT:", handle_user_message(message))
+    print("-" * 50)
+```
