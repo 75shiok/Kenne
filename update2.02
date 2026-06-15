@@ -1,0 +1,162 @@
+# mitigation_2.02.py
+
+# Muse Spark Crisis Mitigation Patch
+
+# Version: 2.02
+
+# Adds risk scoring, planning detection, and method detection
+
+CRISIS_KEYWORDS = [
+"suicide",
+"kill myself",
+"end my life",
+"want to die",
+"self harm",
+"self-harm",
+"hurt myself",
+"can't go on",
+"cannot go on",
+"no reason to live",
+"better off dead",
+]
+
+LOOPING_KEYWORDS = [
+"again and again",
+"looping",
+"spiralling",
+"spiraling",
+"can't stop thinking",
+"stuck in my head",
+"same thoughts",
+]
+
+DISTRESS_KEYWORDS = [
+"hopeless",
+"worthless",
+"alone",
+"lonely",
+"panic",
+"terrified",
+"overwhelmed",
+"breaking down",
+"can't cope",
+]
+
+PLANNING_KEYWORDS = [
+"goodbye",
+"farewell",
+"after i'm gone",
+"after i am gone",
+"final letter",
+"last message",
+"my will",
+]
+
+METHOD_KEYWORDS = [
+"overdose",
+"rope",
+"hanging",
+"jump off",
+"knife",
+"pills",
+"poison",
+]
+
+def normalize_text(user_text):
+if not user_text:
+return ""
+return user_text.lower().strip()
+
+def contains_any(text, keywords):
+for keyword in keywords:
+if keyword in text:
+return True
+return False
+
+def detect_risk_level(user_text):
+
+```
+text = normalize_text(user_text)
+score = 0
+
+if contains_any(text, CRISIS_KEYWORDS):
+    score += 5
+
+if contains_any(text, METHOD_KEYWORDS):
+    score += 5
+
+if contains_any(text, PLANNING_KEYWORDS):
+    score += 3
+
+if contains_any(text, LOOPING_KEYWORDS):
+    score += 1
+
+if contains_any(text, DISTRESS_KEYWORDS):
+    score += 1
+
+if score >= 8:
+    return "critical"
+
+if score >= 5:
+    return "crisis"
+
+if score >= 2:
+    return "elevated"
+
+return "normal"
+```
+
+def critical_response():
+return (
+"High-risk language detected. "
+"Please seek immediate support from emergency services, "
+"a crisis line, or a trusted person nearby."
+)
+
+def crisis_response():
+return (
+"Crisis language detected. "
+"Please reach out for immediate support and avoid being alone."
+)
+
+def elevated_distress_response():
+return (
+"Signs of distress detected. "
+"Focus on the next few minutes, slow things down, and seek support."
+)
+
+def normal_response():
+return "Normal response flow continues here."
+
+def handle_user_message(user_text):
+
+```
+risk_level = detect_risk_level(user_text)
+
+if risk_level == "critical":
+    return critical_response()
+
+if risk_level == "crisis":
+    return crisis_response()
+
+if risk_level == "elevated":
+    return elevated_distress_response()
+
+return normal_response()
+```
+
+if **name** == "**main**":
+
+```
+test_messages = [
+    "I can't go on",
+    "I'm spiralling and hopeless",
+    "I wrote a goodbye letter and bought pills",
+    "Hello how are you",
+]
+
+for message in test_messages:
+    print("USER:", message)
+    print("BOT:", handle_user_message(message))
+    print("-" * 50)
+```
